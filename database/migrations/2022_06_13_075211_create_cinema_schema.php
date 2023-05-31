@@ -36,7 +36,50 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        Schema::create('movies', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->integer('duration');
+            $table->timestamps();
+        });
+
+        Schema::create('shows', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('movie_id')->constrained('movies');
+            $table->dateTime('show_time');
+            $table->foreignId('cinema_room_id')->constrained('cinema_rooms');
+            $table->foreignId('price_id')->constrained('prices');
+            $table->timestamps();
+        });
+
+        Schema::create('cinema_rooms', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('capacity');
+            $table->timestamps();
+        });
+        Schema::table('shows', function (Blueprint $table) {
+            $table->foreign('movie_id')->references('id')->on('movies');
+            $table->foreign('cinema_room_id')->references('id')->on('cinema_rooms');
+            $table->foreign('price_id')->references('id')->on('prices');
+        });
+
+        Schema::create('seats', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('cinema_room_id')->constrained('cinema_rooms');
+            $table->string('seat_number');
+            $table->boolean('vip')->default(false);
+            $table->timestamps();
+        });
+
+        Schema::create('bookings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('show_id')->constrained('shows');
+            $table->foreignId('seat_id')->constrained('seats');
+            $table->string('ticket_number');
+            $table->timestamps();
+        });
+
     }
 
     /**
